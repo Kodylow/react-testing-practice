@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import App from './App';
+import App, {replaceCamelWithSpaces} from './App';
 
 test('button has correct initial color', () => {
   render(<App />);
@@ -43,7 +43,7 @@ test('button disabled after checkbox is checked', () => {
 
   //check button starts enabled
   const colorButton = screen.getByRole('button', { name: 'Change to blue' });
-  const checkbox = screen.getByRole('checkbox');
+  const checkbox = screen.getByRole('checkbox', { name: 'Disable button'});
 
   expect(colorButton).toBeEnabled();
   expect(checkbox).not.toBeChecked();
@@ -55,4 +55,35 @@ test('button disabled after checkbox is checked', () => {
   fireEvent.click(checkbox);
   expect(colorButton).toBeEnabled();
 });
+
+test('disabled button turns gray', () => {
+  render(<App />);
+  const colorButton = screen.getByRole('button', { name: 'Change to blue' });
+  const checkbox = screen.getByRole('checkbox', { name: 'Disable button'});
+
+  //starts enabled
+  expect(colorButton).toBeEnabled();
+
+  //click checkbox to disable
+  fireEvent.click(checkbox);
+
+  //button should be disabled
+  expect(colorButton).not.toBeEnabled();
+
+  //button should be gray
+  expect(colorButton).toHaveStyle({backgroundColor: 'gray'});
+});
+
+describe('spaces before camel-case capital letters', () => {
+  test('should work for no inner capital letters', () => {
+    expect(replaceCamelWithSpaces('Red')).toBe('Red');
+  });
+  test('should work for one inner capital letter', () => {
+    expect(replaceCamelWithSpaces('RedBlue')).toBe('Red Blue');
+  });
+  test('should work for multiple inner capital letters', () => {
+    expect(replaceCamelWithSpaces('RedBlueYellowGreen')).toBe('Red Blue Yellow Green');
+  });
+});
+
 
